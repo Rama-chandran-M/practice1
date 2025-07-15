@@ -1,15 +1,29 @@
 import React,{useState} from "react";
 import axios from 'axios';
+import { useEffect } from "react";
+import './Home.css'
 function Home(){
     const[taskName,setTaskName] = useState('');
     const[deadline,setDeadline] = useState('');
     const[priority,setPriority] = useState('Medium');
+    const[tasks,setTasks] = useState([]);
+    const fetchtasks =()=>{
+        axios.get('http://localhost:5000/tasks/getTasks')
+            .then((response)=>{
+                setTasks(response.data);
+                console.log(response.data);
+            })
+            .catch((error)=>{
+                console.log(error.message)
+            })
+    }
     const handleSubmit = (e)=>{
         e.preventDefault();
         const newTask = {taskName,deadline,priority}
         axios.post('http://localhost:5000/tasks/addTask',newTask)
             .then((response)=>{
                 alert(`${taskName} added successfully!`)
+                fetchtasks();
                 setTaskName('');
                 setDeadline('');
                 setPriority('Medium');
@@ -18,10 +32,23 @@ function Home(){
                 console.log(error.response?.data?.message);
             })
     }
+    const handledelete = (id) =>{
+        axios.delete(`http://localhost:5000/tasks/deleteTask/${id}`)
+            .then(()=>{
+                console.log('Task Deleted Successfully');
+                fetchtasks();
+            })
+            .catch((error)=>{
+                console.log("error in deleteing", error.message)
+            })
+    }
+    useEffect(()=>{
+        fetchtasks();
+    },[])
     return(
         <div>
             <h1>To Do List</h1>
-            <form onSubmit={handleSubmit}>
+            <form className="formclass" onSubmit={handleSubmit}>
                 <p>Enter Task Name</p>
                 <input
                     type="text"
@@ -46,6 +73,20 @@ function Home(){
                 </select>
                 <button type="submit">Add Task</button>
             </form>
+            <h3>Tasks Created</h3>
+            <ul>
+                {tasks.map((task)=>(
+                    <li key = {task.id}>
+                        Task Name : <strong>{task.taskname}</strong>
+                        <br></br>
+                        Deadline : {task.deadline.slice(0,10)}
+                        <br></br>
+                        Priority : {task.priority}
+                        <br></br>
+                        <button onClick={()=>{handledelete(task.id)}}>Delete Task</button>
+                    </li>
+                ))}
+            </ul>
         </div>
     )
 }
