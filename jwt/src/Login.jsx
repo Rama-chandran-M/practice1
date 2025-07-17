@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {Link,useNavigate} from "react-router-dom";
 import axios from "axios";
+import {setToken} from './utils';
 function Login(){
     const [email,setEmail] = useState('');
     const [password,setPassword] = useState('');
@@ -9,7 +10,9 @@ function Login(){
         e.preventDefault();
         axios.post("http://localhost:5000/auth/login",{email,password})
             .then(response => {
-                alert(response.data.message);
+                console.log("token at login page",response.data);
+                setToken(response.data);
+                alert('Login Success');
                 navigate("/home");
             })
             .catch(error => {

@@ -1,15 +1,18 @@
 import React,{useState} from "react";
 import axios from 'axios';
 import { useEffect } from "react";
+import {getToken} from './utils';
 import './Home.css'
+
 function Home(){
     const[taskName,setTaskName] = useState('');
     const[deadline,setDeadline] = useState('');
     const[priority,setPriority] = useState('Medium');
     const[tasks,setTasks] = useState([]);
     const[updateID,setUpdateId] = useState(null);
+    console.log("token",getToken());
     const fetchtasks =()=>{
-        axios.get('http://localhost:5000/tasks/getTasks')
+        axios.get('http://localhost:5000/tasks/getTasks',{headers:{authorization: `Bearer ${getToken()}`}})
             .then((response)=>{
                 setTasks(response.data);
                 console.log(response.data);
@@ -22,7 +25,7 @@ function Home(){
         e.preventDefault();
         const newTask = {taskName,deadline,priority}
         if(updateID===null){
-            axios.post('http://localhost:5000/tasks/addTask',newTask)
+            axios.post('http://localhost:5000/tasks/addTask',newTask,{headers:{authorization: `Bearer ${getToken()}`}})
                 .then((response)=>{
                     alert(`${taskName} added Successfully!`);
                     fetchtasks();
@@ -32,7 +35,7 @@ function Home(){
                     console.log(error.response?.data?.message);
                 })
         }else{
-            axios.put(`http://localhost:5000/tasks/updateTask/${updateID}`,newTask)
+            axios.put(`http://localhost:5000/tasks/updateTask/${updateID}`,newTask,{headers:{authorization:getToken()}})
                 .then(()=>{
                     fetchtasks();
                     resetForm();
@@ -49,7 +52,7 @@ function Home(){
         setPriority(task.priority);
     }
     const handledelete = (id) =>{
-        axios.delete(`http://localhost:5000/tasks/deleteTask/${id}`,newTask)
+        axios.delete(`http://localhost:5000/tasks/deleteTask/${id}`,{headers:{authorization:getToken()}})
             .then(()=>{
                 console.log('Task Deleted Successfully');
                 fetchtasks();

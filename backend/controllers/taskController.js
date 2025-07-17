@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const {JWT_SECRET} = require('../config/utils');
 
 exports.addTask = (req,res) => {
     const {taskName,deadline,priority} = req.body;

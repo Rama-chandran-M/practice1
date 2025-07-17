@@ -1,5 +1,7 @@
 const db = require('../config/db');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const {JWT_SECRET} = require('../config/utils');
 
 // Signup Handler
 exports.signup = async(req,res)=>{
@@ -31,6 +33,8 @@ exports.login = (req,res)=>{
         if(!match){
             return res.status(401).json({message:'Invalid Password'});
         }
-        res.json({message:"Login Successful"});
+        const token = jwt.sign({id:user.id,email:user.email},JWT_SECRET,{expiresIn:'1h'});
+        console.log(token);
+        res.json(token);
     });
 };
