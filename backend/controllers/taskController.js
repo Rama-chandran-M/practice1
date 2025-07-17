@@ -29,3 +29,14 @@ exports.deleteTask = (req,res) =>{
         res.json({message:'Task Deleted'});
     })
 }
+exports.updateTask = (req,res) => {
+    const {taskName,deadline,priority} = req.body;
+    const taskid = req.params.id;
+    db.query('UPDATE tasks SET taskname=? ,deadline=?, priority=? where id=? ',[taskName,deadline,priority,taskid],(err,result)=>{
+        if(err){
+            console.log('Error at Task Controller' , err.message);
+            return res.status(500).json({message:'error in updateing task'});
+        }
+        res.json({message:'Task Updated Successfully'});
+    })
+}
